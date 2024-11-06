@@ -895,7 +895,7 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
     // Set up database
-    let database_url = "postgres://postgres:auranisa14@localhost:5432/postgres"; // Ganti dengan string koneksi Anda
+    let database_url = "postgresql://postgres:iYHCjWESUeoQFnYyDMqufDSnWqRfdGvw@autorack.proxy.rlwy.net:56993/railway"; // Ganti dengan string koneksi Anda
 
     let (client, connection) = tokio_postgres::connect(database_url, NoTls)
         .await
