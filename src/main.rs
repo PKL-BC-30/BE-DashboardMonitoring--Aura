@@ -11,6 +11,7 @@ use rand::Rng;
 use jsonwebtoken::{encode, Header, EncodingKey};
 use std::time::{SystemTime, UNIX_EPOCH};
 use actix_cors::Cors;
+use std::env;
 
 #[derive(Serialize, Deserialize)]
 struct Claims {
@@ -895,9 +896,9 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
     // Set up database
-    let database_url = "postgresql://postgres:iYHCjWESUeoQFnYyDMqufDSnWqRfdGvw@autorack.proxy.rlwy.net:56993/railway"; // Ganti dengan string koneksi Anda
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
-    let (client, connection) = tokio_postgres::connect(database_url, NoTls)
+    let (client, connection) = tokio_postgres::connect(&database_url, NoTls)
         .await
         .expect("Failed to connect to database");
 
@@ -908,6 +909,9 @@ async fn main() -> std::io::Result<()> {
     });
 
     let client = Arc::new(Mutex::new(client));
+
+    let port = env::var("PORT").unwrap_or("8080".to_string());
+    let host = "0.0.0.0";
     
     HttpServer::new(move || {
         App::new()
@@ -932,7 +936,7 @@ async fn main() -> std::io::Result<()> {
             .route("/chart/job", web::get().to(get_chartjob))
             .route("/logout/{user_id}", web::post().to(logout))
     })
-    .bind("127.0.0.1:8082")?
+    .bind(format!("{}:{}", host, port))?
     .run()
     .await
 }
